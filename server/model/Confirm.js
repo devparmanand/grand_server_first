@@ -1,10 +1,10 @@
 const mongoose = require("mongoose")
 
 const ConfirmSchema = new mongoose.Schema({
-    user:{
+    booking:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:[true, "Checkout User Field Is Required"],
+        ref:"Booking",
+        required:[true, "Booking Id Is Required"],
     },
     bookingStatus:{
         type:String,

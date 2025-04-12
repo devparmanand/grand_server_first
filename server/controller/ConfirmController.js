@@ -1,5 +1,5 @@
-const Checkout = require("../Models/Checkout")
-const Product = require("../Models/Product")
+const Confirm = require("../Models/Confirm")
+const Booking = require("../model/Booking")
 const mailer =require("../mailer/index")
 
 const  Razorpay = require ("razorpay")
@@ -37,7 +37,7 @@ async function order(req,res){
 
 async function verifyOrder(req,res){
     try {
-        var check =await Checkout.findOne({_id:req.body.checkid})
+        var check =await Confirm.findOne({_id:req.body.checkid})
         check.rppid = req.body.razorpay_payment_id
         check.paymentStatus="Done"
         check.paymentMode = "Net Banking"
@@ -54,18 +54,18 @@ async function verifyOrder(req,res){
 
 async function createRecord(req,res){
     try {
-                const data = await  new Checkout(req.body)
+                const data = await  new Confirm(req.body)
                 data.date= new Date()
                 await data.save()
 
-                data.products.forEach(async (x)=>{
-                    let product = await Product.findOne({_id : x.product})
-                    product.stockQuantity = product.stockQuantity - x.qty
-                    product.stock = product.stockQuantity - x.qty === 0 ? false :true
-                    await product.save()
+                data.Bookings.forEach(async (x)=>{
+                    let Booking = await Booking.findOne({_id : x.Booking})
+                    Booking.stockQuantity = Booking.stockQuantity - x.qty
+                    Booking.stock = Booking.stockQuantity - x.qty === 0 ? false :true
+                    await Booking.save()
                 });
 
-              let check = await Checkout.findOne({_id:data._id}, {_id:0, user:1})
+              let check = await Confirm.findOne({_id:data._id}, {_id:0, user:1})
                              .populate({path:"user", select:"name -_id email "},
                              )
                 let {user}= check
@@ -113,9 +113,9 @@ async function createRecord(req,res){
 
 async function getAllRecords (req, res){
     try {
-        let data = await Checkout.find().sort({_id:-1}).populate([
+        let data = await Confirm.find().sort({_id:-1}).populate([
             {path:"user", select:"name email phone pin address city state  "},
-            {path:"products.product", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
+            {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
                 options:{slice:{pic:1}},     // this line used to any array from fetch single img 
                 populate:[
                     {path:"maincategory", select:"name"},
@@ -132,9 +132,9 @@ async function getAllRecords (req, res){
 
 async function getAllUserRecords (req, res){
     try {
-        let data = await Checkout.find({user:req.params.userid}).sort({_id:-1}).populate([
+        let data = await Confirm.find({user:req.params.userid}).sort({_id:-1}).populate([
             {path:"user", select:"name email phone pin address city state  "},
-            {path:"products.product", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
+            {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
                 options:{slice:{pic:1}},     // this line used to any array from fetch single img 
                 populate:[
                     {path:"maincategory", select:"name"},
@@ -152,9 +152,9 @@ async function getAllUserRecords (req, res){
 
 async function getSingleRecord(req,res){
     try {
-        let data = await Checkout.findOne({_id:req.params._id}).populate([
+        let data = await Confirm.findOne({_id:req.params._id}).populate([
             {path:"user", select:"name email phone pin address city state  "},
-            {path:"products.product", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
+            {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
                 options:{slice:{pic:1}},     // this line used to any array from fetch single img 
                 populate:[
                     {path:"maincategory", select:"name"},
@@ -176,7 +176,7 @@ async function getSingleRecord(req,res){
 
 async function updateRecord(req,res){
     try {
-        let data= await Checkout.findOne({_id:req.params._id})
+        let data= await Confirm.findOne({_id:req.params._id})
         if(data){
                 data.orderStatus = req.body.orderStatus ?? data.orderStatus
                 data.paymentStatus = req.body.paymentStatus ?? data.paymentStatus
@@ -184,9 +184,9 @@ async function updateRecord(req,res){
                 data.rppid = req.body.rppid ?? data.rppid
                await data.save()
      
-               let  finalData = await Checkout.findOne({_id:data._id}).populate([
+               let  finalData = await Confirm.findOne({_id:data._id}).populate([
                 {path:"user", select:"name email phone pin address city state  "},
-                {path:"products.product", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
+                {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
                     options:{slice:{pic:1}},     // this line used to any array from fetch single img 
                     populate:[
                         {path:"maincategory", select:"name"},
@@ -243,7 +243,7 @@ async function updateRecord(req,res){
 
 async function deleteRecord(req, res){
     try {
-        let data = await Checkout.findOne({_id:req.params._id})
+        let data = await Confirm.findOne({_id:req.params._id})
         if(data){
             await data.deleteOne()
             res.send({result:"Done", message:"Data delete successfully "})
