@@ -48,7 +48,7 @@ const UserScheema = new mongoose.Schema({
     },
     role:{
         type:String,
-        default:"Buyer"    
+        default:"User"    
     },
     otp:{
         type:Number,

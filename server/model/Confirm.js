@@ -1,0 +1,63 @@
+const mongoose = require("mongoose")
+
+const ConfirmSchema = new mongoose.Schema({
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:[true, "Checkout User Field Is Required"],
+    },
+    bookingStatus:{
+        type:String,
+        default:"Booking is Confirm"
+        },
+    paymentMode:{
+        type:String,
+        default:"COD"
+     },
+     paymentStatus:{
+        type:String,
+        default:"Pending"
+     },
+     subtotal:{
+        type:Number,
+        required:[true, "Subtotal Amount is Required"]
+    },
+    gst:{
+        type:Number,
+        required:[true, "Gst Amount is Required"]
+    },
+    total:{
+        type:Number,
+        required:[true, " Total Amount is Required"]
+    },
+    rppid:{
+        type:String,
+       default:""
+    },
+    date:{
+        type:String,
+       default:""
+    },
+   hotels:[
+    {
+        hotel:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Hotel",
+            required:[true, "Hotel Id Is Required"],
+        },
+        qty:{
+            type:Number,
+            required:[true, "Hotel Room Quantity is Required"]
+        },
+        total:{
+            type:Number,
+            required:[true, "Total Amount Is Required"]
+        }
+      
+    }
+   ]
+    
+})
+
+const Confirm = new mongoose.model("Confirm", ConfirmSchema)
+module.exports = Confirm;

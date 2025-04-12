@@ -4,7 +4,7 @@ const mongoose  = require("mongoose")
 async function getConnect(){
     
 //  await   mongoose.connect(process.env.DB_URI)
- await   mongoose.connect("mongodb://localhost:27017/ecom_server_first")
+ await   mongoose.connect("mongodb://localhost:27017/ecom_server_tested")
 
 .then(()=>{
     console.log("Database is Connected");

@@ -26,7 +26,7 @@ require("./db_connect")
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use("/api",Router)
-app.use(express.static("./public"))
+// app.use(express.static("./public"))
 app.use("/public",express.static("./public"))
 
 let PORT = process.env.PORT || 8000
