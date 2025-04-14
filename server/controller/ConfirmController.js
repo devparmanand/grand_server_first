@@ -1,5 +1,6 @@
-const Confirm = require("../Models/Confirm")
+const Confirm = require("../model/Confirm")
 const Booking = require("../model/Booking")
+// const Hotel = require("../model/Hotel")
 const mailer =require("../mailer/index")
 
 const  Razorpay = require ("razorpay")
@@ -52,56 +53,61 @@ async function verifyOrder(req,res){
 
 
 
+
+
+
+
 async function createRecord(req,res){
     try {
                 const data = await  new Confirm(req.body)
                 data.date= new Date()
                 await data.save()
 
-                data.Bookings.forEach(async (x)=>{
-                    let Booking = await Booking.findOne({_id : x.Booking})
-                    Booking.stockQuantity = Booking.stockQuantity - x.qty
-                    Booking.stock = Booking.stockQuantity - x.qty === 0 ? false :true
-                    await Booking.save()
-                });
+                // data.Bookings.forEach(async (x)=>{
+                //     let Booking = await Booking.findOne({_id : x.Booking})
+                //     Booking.stockQuantity = Booking.stockQuantity - x.qty
+                //     Booking.stock = Booking.stockQuantity - x.qty === 0 ? false :true
+                //     await Booking.save()
+                // });
 
-              let check = await Confirm.findOne({_id:data._id}, {_id:0, user:1})
-                             .populate({path:"user", select:"name -_id email "},
+              let check = await Booking.findOne({_id:data._id})
+                             .populate({path:"booking", select:"name -_id email "},
                              )
-                let {user}= check
+                let {booking}= check
                 mailer.sendMail({
                     from:process.env.EMAIL_SENDER,
-                    to:user.email,
-                    subject:"Team DECAELI: Your Order Has Been Placed",
+                    to:booking.email,
+                    subject:"Team V Grand Soba: Your Order Has Been Placed",
                     html:
                       `<h4>
-                             Dear ${user.name},
+                             Dear ${booking.name},
                            </h4>
                         <h4>Your Order Has been placed.</h4>
                         <h4> We’re happy to confirm that we’ve received your order. Below are the details of your purchase: </h4>
 
                     <p>We look forward to providing you with the best shopping experience</p>
-                    <p>Thank you for choosing DECAELI. We hope you enjoy your shopping experience with us!</p> 
+                    <p>Thank you for choosing V Grand Soba. We hope you enjoy your shopping experience with us!</p> 
                             <br/>
 
                         Thanks & Regards,
                         <h2>Mr. Aditya Khanna </h2>
-                        Fonder of DECAELI <br/>
-                          www.decaeli.com
+                        Fonder of V Grand Soba <br/>
+                          www.V Grand Soba.com
                        `
                             },(error)=>{
-                            //   console.log(error);
+                              console.log(error);
 
                              })
               
                 res.send({result:"Done", data:data, message:"Data Create successfully "})
            
     } catch (error) {
+console.log(error);
 
            const errorMessage ={}
-           error.errors?.user ? errorMessage.user = error.errors.user.message:""       
+        //    error.errors?.user ? errorMessage.user = error.errors.user.message:""       
            error.errors?.subtotal ? errorMessage.subtotal = error.errors.subtotal .message:""  
-           error.errors?.shipping ? errorMessage.shipping = error.errors.shipping .message:""       
+           error.errors?.gst ? errorMessage.gst = error.errors.gst .message:""       
            error.errors?.total ? errorMessage.total = error.errors.total .message:""  
           
          Object.values(errorMessage).find(x=>x !=="")?
@@ -114,13 +120,13 @@ async function createRecord(req,res){
 async function getAllRecords (req, res){
     try {
         let data = await Confirm.find().sort({_id:-1}).populate([
-            {path:"user", select:"name email phone pin address city state  "},
-            {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
+            {path:"booking", select:"name email phone"},
+            {path:"Bookings.Booking", select:"roomType checkIn checkOut adult child date ratePerNight numRooms gst total ",
                 options:{slice:{pic:1}},     // this line used to any array from fetch single img 
                 populate:[
-                    {path:"maincategory", select:"name"},
-                    {path:"brand", select:"name"},
-                    {path:"subcategory", select:"name"},
+                    {path:"room", select:"roomType"},
+                    // {path:"brand", select:"name"},
+                    // {path:"subcategory", select:"name"},
                 ]
             },
         ])
@@ -130,36 +136,36 @@ async function getAllRecords (req, res){
     }
 }
 
-async function getAllUserRecords (req, res){
-    try {
-        let data = await Confirm.find({user:req.params.userid}).sort({_id:-1}).populate([
-            {path:"user", select:"name email phone pin address city state  "},
-            {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
-                options:{slice:{pic:1}},     // this line used to any array from fetch single img 
-                populate:[
-                    {path:"maincategory", select:"name"},
-                    {path:"brand", select:"name"},
-                    {path:"subcategory", select:"name"},
-                ]
-            },
-        ])
-        res.send({result:"Done", count:data.length , data:data})
-    } catch (error) {
-        res.status(500).send({result:"fail", reason:"Internal server error"})
-    }
-}
+// async function getAllUserRecords (req, res){
+//     try {
+//         let data = await Confirm.find({user:req.params.userid}).sort({_id:-1}).populate([
+//             {path:"user", select:"name email phone pin address city state  "},
+//             {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
+//                 options:{slice:{pic:1}},     // this line used to any array from fetch single img 
+//                 populate:[
+//                     {path:"maincategory", select:"name"},
+//                     {path:"brand", select:"name"},
+//                     {path:"subcategory", select:"name"},
+//                 ]
+//             },
+//         ])
+//         res.send({result:"Done", count:data.length , data:data})
+//     } catch (error) {
+//         res.status(500).send({result:"fail", reason:"Internal server error"})
+//     }
+// }
 
 
 async function getSingleRecord(req,res){
     try {
         let data = await Confirm.findOne({_id:req.params._id}).populate([
-            {path:"user", select:"name email phone pin address city state  "},
-            {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
+            {path:"booking", select:"name email phone"},
+            {path:"Bookings.Booking", select:"roomType checkIn checkOut adult child date ratePerNight numRooms gst total",
                 options:{slice:{pic:1}},     // this line used to any array from fetch single img 
                 populate:[
-                    {path:"maincategory", select:"name"},
-                    {path:"brand", select:"name"},
-                    {path:"subcategory", select:"name"},
+                    {path:"room", select:"roomType"},
+                    // {path:"brand", select:"name"},
+                    // {path:"subcategory", select:"name"},
                 ]
             },
         ])
@@ -185,38 +191,38 @@ async function updateRecord(req,res){
                await data.save()
      
                let  finalData = await Confirm.findOne({_id:data._id}).populate([
-                {path:"user", select:"name email phone pin address city state  "},
-                {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
+                {path:"booking", select:"name email phone"},
+                {path:"Bookings.Booking", select:"roomType checkIn checkOut adult child date ratePerNight numRooms gst total",
                     options:{slice:{pic:1}},     // this line used to any array from fetch single img 
                     populate:[
-                        {path:"maincategory", select:"name"},
-                        {path:"brand", select:"name"},
-                        {path:"subcategory", select:"name"},
+                        {path:"room", select:"roomType"},
+                        // {path:"brand", select:"name"},
+                        // {path:"subcategory", select:"name"},
                     ]
                 },
             ])
 
-    let user = finalData.user
+    let booking = finalData.booking
     
    mailer.sendMail({
    from:process.env.EMAIL_SENDER,
-   to:user.email,
-   subject:"Team DECAELI: Status of Your  Order Has Been Changed",
+   to:booking.email,
+   subject:"Team V Grand Soba: Status of Your  Order Has Been Changed",
    html:
      `<h4>
-            Dear ${user.name},
+            Dear ${booking.name},
           </h4>
        <h4>Your Order Status Has been Chenged.</h4>
        <h4> We wanted to update you on the status of your order. Below are the details of your recent purchase: </h4>
 
       <p>Your Order Status : ${req.body.orderStatus}</p>
-      <p>Thank you for choosing DECAELI. We hope you enjoy your shopping experience with us!</p> 
+      <p>Thank you for choosing V Grand Soba. We hope you enjoy your shopping experience with us!</p> 
            <br/>
 
        Thanks & Regards,
        <h2>Mr. Aditya Khanna </h2>
-       Founder and partner of DECAELI <br/>
-        www.decaeli.com
+       Founder and partner of V Grand Soba <br/>
+        www.V Grand Soba.com
       `
            },(error)=>{
            //   console.log(error);
@@ -262,7 +268,7 @@ module.exports={
     getAllRecords,
     getSingleRecord,
     updateRecord,
-    getAllUserRecords,
+    // getAllUserRecords,
     deleteRecord, 
     order,
     verifyOrder

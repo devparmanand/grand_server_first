@@ -32,20 +32,33 @@ amenities3:{
     type:String,
     default:""
   },
-  stock:{
-     type:Number,
-    required:[true,"Stock is Mandatory"]
+//   stock:{
+//      type:Number,
+//     required:[true,"Stock is Mandatory"]
      
-  },
-  stockQuantity:{
-    type:Number,
-   required:[true,"Stock Quantity is Mandatory"]
+//   },
+//   stockQuantity:{
+//     type:Number,
+//    required:[true,"Stock Quantity is Mandatory"]
     
- },
-  price:{
-    type:Number,
-    required:[true,"Price is Mandatory"]
-  },
+//  },
+ ratePerNight:{
+  type:Number,
+  required:[true,"Rate Per Night is Required"]
+},
+// numRooms:{
+//  type:Number,
+//  required:[true,"Number of Room is Required"]
+// },
+gst:{
+type:Number,
+required:[true,"Number of Room is Required"]
+},
+
+total:{
+  type:Number,
+  required:[true, "Total Amount Is Required"]
+},
   // pic:{
   //   type:String,
   //   required:[true,"Pic is Mandatory"]

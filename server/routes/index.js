@@ -8,6 +8,7 @@ const EnqueryRouter = require("../routes/EnqueryRoutes")
 const HotelRouter = require("../routes/HotelRoutes")
 const RoomRouter = require("../routes/RoomRoutes")
 const BookingRouter = require("./BookingRoutes")
+const ConfirmRouter = require("./ConfirmRoutes")
 // const SelectRoomRouter = require("../routes/SelectRoomRoutes")
 
 
@@ -21,6 +22,7 @@ Router.use("/enquery",EnqueryRouter)
 Router.use("/room",RoomRouter)
 Router.use("/hotel",HotelRouter)
 Router.use("/booking",BookingRouter)
+Router.use("/confirm",ConfirmRouter)
 // Router.use("/selectroom",SelectRoomRouter)
 
 
