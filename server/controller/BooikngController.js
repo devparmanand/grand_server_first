@@ -2,6 +2,7 @@ const Booking = require("../model/Booking")
 async function createRecord(req,res){
     try {
         const data = new Booking(req.body)
+        data.date = new Date()
         await data.save()
 
       
@@ -9,14 +10,16 @@ async function createRecord(req,res){
     } catch (error) {
         console.log(error);
        const errorMessage=[]
-        error.errors?.user ? errorMessage.push({user:error.errors.user.message}) : ""
+        error.errors?.name ? errorMessage.push({name:error.errors.name.message}) : ""
+        error.errors?.email ? errorMessage.push({email:error.errors.email.message}) : ""
+        error.errors?.phone ? errorMessage.push({phone:error.errors.phone.message}) : ""
         error.errors?.hotel ? errorMessage.push({hotel:error.errors.hotel.message}) : ""
         error.errors?.checkInDate ? errorMessage.push({checkInDate:error.errors.checkInDate.message}) : ""
         error.errors?.checkOutDate ? errorMessage.push({checkOutDate:error.errors.checkOutDate.message}) : ""
         error.errors?.adult ? errorMessage.push({adult:error.errors.adult.message}) : ""
         error.errors?.child ? errorMessage.push({child:error.errors.child.message}) : ""
         error.errors?.qty ? errorMessage.push({qty:error.errors.qty.message}) : ""
-        error.errors?.total ? errorMessage.push({total:error.errors.total.message}) : ""
+        error.errors?.numRooms ? errorMessage.push({numRooms:error.errors.numRooms.message}) : ""
 
         errorMessage.length===0?
         res.status(500).send({result:"Fail",reason:"Internal Server Error"}):

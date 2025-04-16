@@ -16,11 +16,11 @@ const ContactUsScheema = new mongoose.Schema({
         required:[true,"Phone Number  is Mandaitory"],
        
     },
-    subject:{
-        type:String,
-        required:[true,"Subject  is Mandaitory"],
+    // subject:{
+    //     type:String,
+    //     required:[true,"Subject  is Mandaitory"],
        
-    },
+    // },
     message:{
         type:String,
         required:[true,"Message  is Mandaitory"],

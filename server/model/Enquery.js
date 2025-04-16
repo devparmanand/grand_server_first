@@ -6,25 +6,17 @@ const EnqueryScheema = new mongoose.Schema({
         required:[true,"Name is Mandatory"],
         
     },
-    eamil:{
+    email:{
         type:String,
         required:[true,"Email is Mandatory"]
     }
     ,
     phone:{
-        type:String,
+        type:Number,
         required:[true , "Phone is Mandatory"],
     }
     ,
-    location:{
-        type:String,
-        required:[true , "Location is Mandatory"]
-    },
-    date:{
-        type:String,
-        required:[true,"Date is Mandatory"],
-    
-    },
+
     event:{
         type:String,
         required:[true, "Event Type is Mandatory"]

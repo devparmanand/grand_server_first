@@ -43,7 +43,7 @@ async function createRecord(req,res){
         error.errors?.name ? errorMessage.push({name:error.errors.name.message}) : ""
         error.errors?.email ? errorMessage.push({email:error.errors.email.message}) : ""
         error.errors?.phone ? errorMessage.push({phone:error.errors.phone.message}) : ""
-        error.errors?.subject ? errorMessage.push({subject:error.errors.subject.message}) : ""
+        // error.errors?.subject ? errorMessage.push({subject:error.errors.subject.message}) : ""
         error.errors?.message ? errorMessage.push({message:error.errors.message.message}) : ""
         errorMessage.length===0?
         res.status(500).send({result:"Fail",reason:"Internal Server Error"}):

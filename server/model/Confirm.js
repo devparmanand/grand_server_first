@@ -32,30 +32,30 @@ const ConfirmSchema = new mongoose.Schema({
     },
     rppid:{
         type:String,
-       default:""
+       default:"283jefu8311dyyyryryr"
     },
     date:{
         type:String,
        default:""
     },
-   hotels:[
-    {
-        hotel:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Hotel",
-            required:[true, "Hotel Id Is Required"],
-        },
-        qty:{
-            type:Number,
-            required:[true, "Hotel Room Quantity is Required"]
-        },
-        total:{
-            type:Number,
-            required:[true, "Total Amount Is Required"]
-        }
+//    hotels:[
+//     {
+//         hotel:{
+//             type:mongoose.Schema.Types.ObjectId,
+//             ref:"Hotel",
+//             required:[true, "Hotel Id Is Required"],
+//         },
+//         qty:{
+//             type:Number,
+//             required:[true, "Hotel Room Quantity is Required"]
+//         },
+//         total:{
+//             type:Number,
+//             required:[true, "Total Amount Is Required"]
+//         }
       
-    }
-   ]
+//     }
+//    ]
     
 })
 

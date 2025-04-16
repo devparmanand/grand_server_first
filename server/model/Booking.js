@@ -25,13 +25,13 @@ const BookingScheema = new mongoose.Schema({
     //     required:[true,"Room Type  is Mandaitory"],
        
     // },
-    checkIn:{
+    checkInDate:{
         type:String,
         required:[true,"Check In Date  is Mandaitory"],
        
     },
 
-    checkOut:{
+    checkOutDate:{
         type:String,
         required:[true,"Check Out Date  is Mandaitory"],
        
@@ -51,32 +51,21 @@ const BookingScheema = new mongoose.Schema({
         required:[true, "Child Amount Is Required"]
 
     },
-    qty:{
-        type:Number,
-        required:[true, "Room Quantity Is Required"]
+    // qty:{
+    //     type:Number,
+    //     required:[true, "Room Quantity Is Required"]
 
-    },
+    // },
      
     date:{
         type:String,
         default:""
     },
-    ratePerNight:{
-         type:Number,
-         required:[true,"Rate Per Night is Required"]
-    },
     numRooms:{
         type:Number,
         required:[true,"Number of Room is Required"]
    },
-   gst:{
-    type:Number,
-    required:[true,"Number of Room is Required"]
-},
-    total:{
-        type:Number,
-        required:[true, "Total Amount Is Required"]
-    }
+   
 
    
 

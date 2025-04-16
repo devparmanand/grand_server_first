@@ -1,275 +1,97 @@
 const Confirm = require("../model/Confirm")
-const Booking = require("../model/Booking")
-// const Hotel = require("../model/Hotel")
-const mailer =require("../mailer/index")
-
-const  Razorpay = require ("razorpay")
-
-
-// Payment Api
-
-async function order(req,res){
-    try {
-        console.log(process.env.RPKEY);
-         const  instance = new Razorpay({
-            key_id : process.env.RPKEY,
-            key_secret : process.env.RPSECRET_KEY
-            
-          });
-          console.log(req.body.amount);
-          
-        const options = {
-            amount : req.body.amount * 100,
-            currency : "INR"
-        };
-        instance.orders.create(options, (error,order)=>{
-            if(error){
-                console.log(error ,"RAZORPAY");
-                return res.status(500).json({message:"Something went wrong"})                
-            }
-            res.status(200).json({data:order})
-        })
-    } catch (error) {
-        res.status(500).json({message:"Internal server error"})
-        console.log(error);
-    }
-}
-
-
-async function verifyOrder(req,res){
-    try {
-        var check =await Confirm.findOne({_id:req.body.checkid})
-        check.rppid = req.body.razorpay_payment_id
-        check.paymentStatus="Done"
-        check.paymentMode = "Net Banking"
-        await check.save()
-        res.status(200).json({result:"Done", message:"Payment Done Successfully"})
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({message:"Internal server error"})
-    }
-}
-
-
-
-
-
-
-
-
 async function createRecord(req,res){
     try {
-                const data = await  new Confirm(req.body)
-                data.date= new Date()
-                await data.save()
+        const data = new Confirm(req.body)
+        data.date = new Date()
+        await data.save()
 
-                // data.Bookings.forEach(async (x)=>{
-                //     let Booking = await Booking.findOne({_id : x.Booking})
-                //     Booking.stockQuantity = Booking.stockQuantity - x.qty
-                //     Booking.stock = Booking.stockQuantity - x.qty === 0 ? false :true
-                //     await Booking.save()
-                // });
-
-              let check = await Booking.findOne({_id:data._id})
-                             .populate({path:"booking", select:"name -_id email "},
-                             )
-                let {booking}= check
-                mailer.sendMail({
-                    from:process.env.EMAIL_SENDER,
-                    to:booking.email,
-                    subject:"Team V Grand Soba: Your Order Has Been Placed",
-                    html:
-                      `<h4>
-                             Dear ${booking.name},
-                           </h4>
-                        <h4>Your Order Has been placed.</h4>
-                        <h4> We’re happy to confirm that we’ve received your order. Below are the details of your purchase: </h4>
-
-                    <p>We look forward to providing you with the best shopping experience</p>
-                    <p>Thank you for choosing V Grand Soba. We hope you enjoy your shopping experience with us!</p> 
-                            <br/>
-
-                        Thanks & Regards,
-                        <h2>Mr. Aditya Khanna </h2>
-                        Fonder of V Grand Soba <br/>
-                          www.V Grand Soba.com
-                       `
-                            },(error)=>{
-                              console.log(error);
-
-                             })
-              
-                res.send({result:"Done", data:data, message:"Data Create successfully "})
-           
-    } catch (error) {
-console.log(error);
-
-           const errorMessage ={}
-        //    error.errors?.user ? errorMessage.user = error.errors.user.message:""       
-           error.errors?.subtotal ? errorMessage.subtotal = error.errors.subtotal .message:""  
-           error.errors?.gst ? errorMessage.gst = error.errors.gst .message:""       
-           error.errors?.total ? errorMessage.total = error.errors.total .message:""  
-          
-         Object.values(errorMessage).find(x=>x !=="")?
-             res.status(500).send({result:"Fail", ...errorMessage})
-             :
-             res.status(500).send({result:"Fail", reason:"Internal server error"})
-    }
-}
-
-async function getAllRecords (req, res){
-    try {
-        let data = await Confirm.find().sort({_id:-1}).populate([
-            {path:"booking", select:"name email phone"},
-            {path:"Bookings.Booking", select:"roomType checkIn checkOut adult child date ratePerNight numRooms gst total ",
-                options:{slice:{pic:1}},     // this line used to any array from fetch single img 
-                populate:[
-                    {path:"room", select:"roomType"},
-                    // {path:"brand", select:"name"},
-                    // {path:"subcategory", select:"name"},
-                ]
-            },
-        ])
-        res.send({result:"Done", count:data.length , data:data})
-    } catch (error) {
-        res.status(500).send({result:"fail", reason:"Internal server error"})
-    }
-}
-
-// async function getAllUserRecords (req, res){
-//     try {
-//         let data = await Confirm.find({user:req.params.userid}).sort({_id:-1}).populate([
-//             {path:"user", select:"name email phone pin address city state  "},
-//             {path:"Bookings.Booking", select:"name maincategory subcategory brand color size finalPrice pic stockQuantity",
-//                 options:{slice:{pic:1}},     // this line used to any array from fetch single img 
-//                 populate:[
-//                     {path:"maincategory", select:"name"},
-//                     {path:"brand", select:"name"},
-//                     {path:"subcategory", select:"name"},
-//                 ]
-//             },
-//         ])
-//         res.send({result:"Done", count:data.length , data:data})
-//     } catch (error) {
-//         res.status(500).send({result:"fail", reason:"Internal server error"})
-//     }
-// }
-
-
-async function getSingleRecord(req,res){
-    try {
-        let data = await Confirm.findOne({_id:req.params._id}).populate([
-            {path:"booking", select:"name email phone"},
-            {path:"Bookings.Booking", select:"roomType checkIn checkOut adult child date ratePerNight numRooms gst total",
-                options:{slice:{pic:1}},     // this line used to any array from fetch single img 
-                populate:[
-                    {path:"room", select:"roomType"},
-                    // {path:"brand", select:"name"},
-                    // {path:"subcategory", select:"name"},
-                ]
-            },
-        ])
-        if(data)
-            res.send({result:"Done", data:data})
-        else
-          res.status(500).send({result:"Fail", reason:"Invailid Id or Data Not Found"})
-    } catch (error) {
-         console.log(error);
-         res.status(500).send({result:"fail", reason:"Internal Server error"})
-    }
-}
-
-
-async function updateRecord(req,res){
-    try {
-        let data= await Confirm.findOne({_id:req.params._id})
-        if(data){
-                data.orderStatus = req.body.orderStatus ?? data.orderStatus
-                data.paymentStatus = req.body.paymentStatus ?? data.paymentStatus
-                data.paymentMode = req.body.paymentMode ?? data.paymentMode
-                data.rppid = req.body.rppid ?? data.rppid
-               await data.save()
-     
-               let  finalData = await Confirm.findOne({_id:data._id}).populate([
-                {path:"booking", select:"name email phone"},
-                {path:"Bookings.Booking", select:"roomType checkIn checkOut adult child date ratePerNight numRooms gst total",
-                    options:{slice:{pic:1}},     // this line used to any array from fetch single img 
-                    populate:[
-                        {path:"room", select:"roomType"},
-                        // {path:"brand", select:"name"},
-                        // {path:"subcategory", select:"name"},
-                    ]
-                },
-            ])
-
-    let booking = finalData.booking
-    
-   mailer.sendMail({
-   from:process.env.EMAIL_SENDER,
-   to:booking.email,
-   subject:"Team V Grand Soba: Status of Your  Order Has Been Changed",
-   html:
-     `<h4>
-            Dear ${booking.name},
-          </h4>
-       <h4>Your Order Status Has been Chenged.</h4>
-       <h4> We wanted to update you on the status of your order. Below are the details of your recent purchase: </h4>
-
-      <p>Your Order Status : ${req.body.orderStatus}</p>
-      <p>Thank you for choosing V Grand Soba. We hope you enjoy your shopping experience with us!</p> 
-           <br/>
-
-       Thanks & Regards,
-       <h2>Mr. Aditya Khanna </h2>
-       Founder and partner of V Grand Soba <br/>
-        www.V Grand Soba.com
-      `
-           },(error)=>{
-           //   console.log(error);
-
-            })
-
-
-               res.send({result:"Done", data:finalData, message:"data update successfully"})
-           
-         
-        }
-        else
-         res.status(500).send({result:"fail", reason:"Invalid id or Data not found"})
+      
+        res.send({result:"Done", data:data ,message:"Record is created, Successfully"})
     } catch (error) {
         console.log(error);
-         let errorMessage = []
-       
-          res.status(500).send({result:"fail", reason:"Internal server error"}) 
-         
+       const errorMessage=[]
+        error.errors?.booking ? errorMessage.push({booking:error.errors.booking.message}) : ""
+        error.errors?.subtotal ? errorMessage.push({subtotal:error.errors.subtotal.message}) : ""
+        error.errors?.gst ? errorMessage.push({gst:error.errors.gst.message}) : ""
+        error.errors?.total ? errorMessage.push({total:error.errors.total.message}) : ""
+
+        errorMessage.length===0?
+        res.status(500).send({result:"Fail",reason:"Internal Server Error"}):
+        res.status(500).send({result:"Fail",reason:errorMessage})
         
+
     }
 }
 
-
-async function deleteRecord(req, res){
+async function getAllRecord(req,res){
+    
     try {
-        let data = await Confirm.findOne({_id:req.params._id})
+        const data  = await Confirm.find().sort({_id:-1})
+        res.send({result:"Done",cont:data.length,data:data})   
+    } catch (error) {
+        res.status(500).send({result:"Fail",reason:"Internal Server Error"})
+    }
+}
+
+async function getSingleRecord(req,res){
+    
+    try {
+        const data  = await Confirm.findOne({_id:req.params._id})
+        if(data)
+          res.send({result:"Done",data:data})  
+        else
+        res.send({result:"Fail",reason:"Invalid Id, Record Not Found"})  
+
+    } catch (error) {
+        res.status(500).send({result:"Fail",reason:"Internal Server Error"})
+    }
+}
+
+async function updateRecord(req,res){
+     try {
+        const data  = await Confirm.findOne({_id:req.params._id})
         if(data){
+            data.total=req.body.total??data.total
+            await data.save()
+
+
+        res.send({result:"Done",message:"Record Updated, Successfully"})  
+               }
+        else
+        res.send({result:"Fail",reason:"Invalid Id, Record Not Found"})  
+
+    } catch (error) {
+        res.status(500).send({result:"Fail",reason:"Internal Server Error"})
+    }
+}
+
+async function deleteRecord(req,res){
+    try {
+        const data  = await Confirm.findOne({_id:req.params._id})
+        if(data){
+          if(data.active){
+            res.send({result:"Fail" ,reason:"Can't Delete Active Contact Us Query"})
+          }
+          else{
             await data.deleteOne()
-            res.send({result:"Done", message:"Data delete successfully "})
+            res.send({result:"Done",reason:"Record is Deleted"})  
+          }
         }
         else
-        res.status(500).send({result:"fail", reason:"Invailid Id or Data Not Found"})
-       
+        res.send({result:"Fail",reason:"Invalid Id, Record Not Found"})  
+
     } catch (error) {
-        res.status(500).send({result:"fail", reason:"Internal Server Error"})        
+        res.status(500).send({result:"Fail",reason:"Internal Server Error"})
     }
 }
-
 
 module.exports={
     createRecord,
-    getAllRecords,
+    getAllRecord,
     getSingleRecord,
     updateRecord,
-    // getAllUserRecords,
-    deleteRecord, 
-    order,
-    verifyOrder
+    deleteRecord
 }
+
+
+

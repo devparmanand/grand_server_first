@@ -7,9 +7,9 @@ const {createRecord, getAllRecord, getSingleRecord, updateRecord,
  = require("../controller/UserController")
 
 UserRouter.post("/",createRecord)
-UserRouter.get("/", verifyAdmin,getAllRecord)
-UserRouter.get("/:_id", verifyBoth,getSingleRecord)
-UserRouter.put("/:_id",  verifyBoth,userUploader.single("pic"),updateRecord)   
+UserRouter.get("/",getAllRecord)
+UserRouter.get("/:_id",getSingleRecord)
+UserRouter.put("/:_id",userUploader.single("pic"),updateRecord)   
 UserRouter.delete("/:_id", verifyAdmin,deleteRecord)   
 UserRouter.post("/login", login)   
 UserRouter.post("/forget-password-1", forgetPassowrd1)   
