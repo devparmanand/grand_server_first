@@ -23,7 +23,7 @@ async function getAllRecord(req,res){
     
     try {
         const data  = await Room.find().sort({_id:-1})
-        res.send({result:"Done",cont:data.length,data:data})   
+        res.send({result:"Done",count:data.length,data:data})   
     } catch (error) {
         res.status(500).send({result:"Fail",reason:"Internal Server Error"})
     }

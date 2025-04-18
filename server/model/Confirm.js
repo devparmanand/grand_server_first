@@ -12,7 +12,7 @@ const ConfirmSchema = new mongoose.Schema({
         },
     paymentMode:{
         type:String,
-        default:"COD"
+        default:"Pay at Hotel"
      },
      paymentStatus:{
         type:String,

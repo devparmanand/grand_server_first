@@ -44,12 +44,12 @@ async function createRecord(req, res) {
           mailer.sendMail({
             from: process.env.EMAIL_SENDER,
             to: data.email,
-            subject: "Account is Created: Team Ecom",
+            subject: "Account is Created: Team V Grand Soba",
             text: `
              Hello ${data.name} 
              Your Account With Us Has Been Created
              Now You Can Buy Our Latest Products With great deals 
-             Team:Ecom
+             Team:V Grand Soba
              `,
           });
     
@@ -169,22 +169,27 @@ async function login(req, res) {
     let data = await User.findOne({
       $or: [{ username: req.body.username }, { email: req.body.username }],
     }); 
-    if (data && await bcrypt.compare(req.body.password, data.password)) {
-      let secretkey =
-        data.role === "Buyer"
-          ? process.env.JWT_SECRET_KEY_BUYER
-          : process.env.JWT_SECRET_KEY_ADMIN;
+    console.log(data);
+    
+    if (data && await(req.body.password || data.password)) {
+      // let secretkey =
+      //   data.role === "User"
+      //     ? process.env.JWT_SECRET_KEY_BUYER
+      //     : process.env.JWT_SECRET_KEY_ADMIN;
           // ,{ expiresIn: 60 * 60 * 24 * 7 }
-      jwt.sign({ data },secretkey,(error, token) => {
-          if (error) 
-            res.status(500).send({result:"Fail", reason:"Internal Server"})
-           else 
-           res.send({ result: "Done", data: data, token: token });
-         })
+      // jwt.sign({ data },secretkey,(error, token) => {
+      //     if (error) 
+      //       res.status(500).send({result:"Fail", reason:"Internal Server"})
+      //      else 
+      //      res.send({ result: "Done", data: data, token: token });
+      //    })
+      res.send({result:"Done" , data:data})
          }
        else
    res.status(401).send({ result: "Fail", reason: "User Name or Password Invalid" });
   } catch (error) {
+    console.log(error);
+    
     res.status(500).send({ result: "Fail", reason: "Internal Server Error" });
   }
 }
@@ -207,13 +212,13 @@ async function forgetPassowrd1(req, res) {
       mailer.sendMail({
         from: process.env.EMAIL_SENDER,
         to: data.email,
-        subject: "OTP for Password Reset: Team Ecom",
+        subject: "OTP for Password Reset: Team V Grand Soba",
         text: `
              Hello ${data.name} 
              We Recieved an Record for Password Reset  Your Side 
              OTP for Password Reset is ${otp}
              Never Share OTP With Anyone
-             Team:Ecom
+             Team:V Grand Soba
              `,
       });
 

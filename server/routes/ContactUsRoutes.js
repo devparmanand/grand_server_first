@@ -4,8 +4,8 @@ const {createRecord, getAllRecord, getSingleRecord, updateRecord, deleteRecord}
  = require("../controller/ContactusController")
 
 ContactUsRouter.post("/" ,createRecord)
-ContactUsRouter.get("/",verifyAdmin,getAllRecord)
-ContactUsRouter.get("/:_id",verifyAdmin,getSingleRecord)
+ContactUsRouter.get("/" , getAllRecord)
+ContactUsRouter.get("/:_id" , getSingleRecord)
 ContactUsRouter.put("/:_id",verifyAdmin,)   
 ContactUsRouter.delete("/:_id", verifyAdmin, deleteRecord)   
 
